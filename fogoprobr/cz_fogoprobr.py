@@ -34,12 +34,12 @@ class FogoprobrCz(BaseCommitizen):
                 "choices": [
                     {
                         "value": "fix",
-                        "name": "fix: Concerta bug.",
+                        "name": "fix: Concerta bug",
                         "key": "x",
                     },
                     {
                         "value": "feat",
-                        "name": "feat: Implementa ou adiciona feature.",
+                        "name": "feat: Implementa ou adiciona feature",
                         "key": "f",
                     },
                     {
@@ -72,7 +72,7 @@ class FogoprobrCz(BaseCommitizen):
                     {
                         "value": "test",
                         "name": (
-                            "test: Adição or correção de " "testes existentes"
+                            "test: Adição ou correção de " "testes existentes"
                         ),
                         "key": "t",
                     },
