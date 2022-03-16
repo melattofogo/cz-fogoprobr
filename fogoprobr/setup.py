@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="commitizen-cz-fogoprobr",
-    version="1.0.1",
+    version="1.0.2",
     py_modules=["cz_fogoprobr"],
     license="MIT",
     long_description=README,
