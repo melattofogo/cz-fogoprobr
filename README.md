@@ -1,5 +1,11 @@
 # commitizen-cz-fogoprobr
 
+## Instalação
+
+```
+pip install commitizen-cz-fogoprobr
+```
+
 ## Uso
 
 Listar commitizen instalados
