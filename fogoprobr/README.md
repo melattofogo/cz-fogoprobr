@@ -1,5 +1,7 @@
 # commitizen-cz-fogoprobr
 
+Commitizen personalizado por melattofogo
+
 ## Uso
 
 Listar commitizen instalados
