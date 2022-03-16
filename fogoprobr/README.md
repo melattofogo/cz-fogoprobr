@@ -10,7 +10,7 @@ Listar commitizen instalados
 cz ls
 ```
 
-*Commit* de modificações em *stage*
+*Commit* de *code* em *stage*
 
 ```
 cz --name cz_fogoprobr commit
