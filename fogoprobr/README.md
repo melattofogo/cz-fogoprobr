@@ -27,5 +27,5 @@ cz commit
 
 - [commitizen](https://github.com/commitizen-tools/commitizen) ```2.21.2```
 
-## Ator
-João Fogo (melatto.fogo@live.com)
+## Autor
+Joao Fogo (melatto.fogo@live.com)
