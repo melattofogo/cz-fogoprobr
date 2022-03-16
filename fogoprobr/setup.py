@@ -8,5 +8,6 @@ setup(
     license="MIT",
     long_description="Commitizen personalizado por melattofogo",
     long_description_content_type="text/x-rst",
+    url="https://github.com/melattofogo/cz-fogoprobr",
     install_requires=["commitizen>=2.21.2"],
 )
