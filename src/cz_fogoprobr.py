@@ -1,167 +1,60 @@
+from __future__ import annotations
+from typing import List, Dict, Any
+import re
 from commitizen.cz.base import BaseCommitizen
-from commitizen.cz.utils import multiple_line_breaker, required_validator
+from commitizen.git import GitCommit
 
-def parse_scope(text):
-    if not text:
-        return ""
+from .spec import (
+    TYPES, SCHEMA_PATTERN, BUMP_PATTERN, BUMP_MAP, CHANGELOG_PATTERN
+)
 
-    scope = text.strip().split()
-    if len(scope) == 1:
-        return scope[0]
+class CzFogoprobr(BaseCommitizen):
+    def info(self) -> str:
+        return "fogoprobr Commitizen convention (strict header, optional scope, optional breaking '!')."
 
-    return "-".join(scope)
+    def example(self) -> str:
+        return "feat(auth)!: add OAuth2 login"
 
-def parse_subject(text):
-    if isinstance(text, str):
-        text = text.strip(".").strip()
+    def schema(self) -> str:
+        return "<type>(<scope>)!: <subject>"
 
-    return required_validator(text, msg="Assunto é obrigatório.")
+    def schema_pattern(self) -> str:
+        return SCHEMA_PATTERN
 
-class FogoprobrCz(BaseCommitizen):
-    def questions(self) -> list:
-        """Perguntas sobre a mensagem de commit.
-
-        Deve seguir o formato 'whaaaaat'.
-        Mais Sobre: https://github.com/finklabs/whaaaaat/
-
-        :rtype: list
-        """
-        questions = [
-            {
-                "type": "list",
-                "name": "prefix",
-                "message": "Selecione o tipo de alteração que você está 'commitando'",
-                "choices": [
-                    {
-                        "value": "fix",
-                        "name": "fix: Concerta bug",
-                        "key": "x",
-                    },
-                    {
-                        "value": "feat",
-                        "name": "feat: Implementa ou adiciona feature",
-                        "key": "f",
-                    },
-                    {
-                        "value": "doc",
-                        "name": "doc: Mudanças apenas de documentação",
-                        "key": "d",
-                    },
-                    {
-                        "value": "chore",
-                        "name": (
-                            "chore: Alterações que não afetam o "
-                            "sentido do código (white-space, formatação,"
-                            " semi-colons, criação file/folder)"
-                        ),
-                        "key": "c",
-                    },
-                    {
-                        "value": "refactor",
-                        "name": (
-                            "refactor: Alterações de código que não concerta "
-                            "um bug e nem adiciona feature"
-                        ),
-                        "key": "r",
-                    },
-                    {
-                        "value": "perf",
-                        "name": "perf: Mudanças de código que melhoram performance",
-                        "key": "p",
-                    },
-                    {
-                        "value": "test",
-                        "name": (
-                            "test: Adição ou correção de " "testes existentes"
-                        ),
-                        "key": "t",
-                    },
-                ],
-            },
-            {
-                "type": "input",
-                "name": "scope",
-                "message": (
-                    "Qual é o escopo da mudança? (class ou file name): ( [enter]  para pular )\n"
-                ),
-                "filter": parse_scope,
-            },
+    def questions(self) -> List[Dict[str, Any]]:
+        return [
+            {"type": "list", "name": "type", "message": "Select the type:", "choices": TYPES},
+            {"type": "input", "name": "scope", "message": "Scope (optional):"},
+            {"type": "confirm", "name": "is_breaking", "message": "Breaking change?", "default": False},
             {
                 "type": "input",
                 "name": "subject",
-                "filter": parse_subject,
-                "message": (
-                    "Escreva um breve resumo imperativo das alterações do código: ( lower case e sem pontuação )\n"
-                ),
-            },
-            {
-                "type": "input",
-                "name": "body",
-                "message": (
-                    "Forneça informações adicionais sobre o contexto das alterações de código: ( [enter] para pular )\n"
-                ),
-                "filter": multiple_line_breaker,
+                "message": "Short, imperative subject:",
+                "filter": str.strip,
+                "validate": lambda s: 5 <= len(s) <= 72,
             },
         ]
-        return questions
 
-    def message(self, answers: dict) -> str:
-        """Gera a mensagem com as respostas dadas.
-
-        :type answers: dict
-        :rtype: string
-        """
-        prefix = answers["prefix"]
-        scope = answers["scope"]
+    def message(self, answers: Dict[str, Any]) -> str:
+        t = answers["type"]
+        scope = f"({answers['scope']})" if answers.get("scope") else ""
+        bang = "!" if answers.get("is_breaking") else ""
         subject = answers["subject"]
-        body = answers["body"]
+        return f"{t}{scope}{bang}: {subject}"
 
-        if scope:
-            scope = f"({scope})"
-        if body:
-            body = f"\n\n{body}"
+    def bump_pattern(self) -> str:
+        return BUMP_PATTERN
 
-        message = f"{prefix}{scope}: {subject}{body}"
+    def bump_map(self) -> Dict[str, str]:
+        return BUMP_MAP
 
-        return message
+    def changelog_pattern(self) -> str:
+        return CHANGELOG_PATTERN
 
-    def example(self):
-        """Forneça um exemplo para ajudar a entender o estilo [OPCIONAL]
-        Usado pelo exemplo cz.
-
-        :rtype: string
-        """
-        return 'doc(README.md): adiciona tutorial de instalacao'
-
-    def schema(self) -> str:
-        """Mostrar o schema usado [OPCIONAL]
-
-        :rtype: string
-        """
-        return (
-            "<type>(<scope>): <subject>\n"
-            "<BLANK LINE>\n"
-            "<body>"
-        )
-
-    def info(self) -> str:
-        return (
-            "O commit contém os seguintes elementos estruturais, para documentar\n"
-            "aos consumidores da biblioteca:\n\n"
-
-            "fix: um commit do tipo fix corrige um bug em sua base de código\n\n"
-
-            "feat: um commit do tipo feat introduz um novo recurso na base de código\n\n"
-
-            "Outros: tipos de commit diferentes de fix: e feat: são permitidos,\n"
-            "como doc:, chore:, refactor:, perf: e test:.\n\n"
-
-            "Um escopo pode ser fornecido para um tipo de confirmação, para fornecer contexto informação\n"
-            "adicional e está contida entre parênteses, por exemplo, feat(parser): adiciona a capacidade de analisar matrizes.\n"
-
-            "<type>[optional scope]: <description>\n"
-
-            "[optional body]"
-        )
-
-discover_this = FogoprobrCz
+    def subject(self, commit: GitCommit) -> str:
+        first = commit.message.splitlines()[0]
+        m = re.match(SCHEMA_PATTERN, first)
+        if not m:
+            return first
+        scope = f"({m.group('scope')})" if m.group('scope') else ""
+        return f"{m.group('type')}{scope}: {m.group('subject')}"

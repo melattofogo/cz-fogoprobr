@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cz-fogoprobr"
+version = "0.1.0"
+description = "Commitizen adapter: fogoprobr custom rules"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "João Fogo", email = "fogo.melatto@gmail.com" }]
+keywords = ["commitizen", "conventional-commits", "cz", "fogoprobr"]
+dependencies = [
+    "commitizen>=3.28",
+    "packaging==25.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/melattofogo/cz-fogoprobr"
+Repository = "https://github.com/melattofogo/cz-fogoprobr"
+Issues = "https://github.com/melattofogo/cz-fogoprobr/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cz_fogoprobr"]
+
+# --- Optional dev tools ---
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = ["E","F","I","UP"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+
+# Example Commitizen config for THIS repo (so you can use cz here too if you want)
+[tool.commitizen]
+name = "cz_fogoprobr"
+version = "0.1.0"
+tag_format = "v$version"
+update_changelog_on_bump = true
+
+[dependency-groups]
+dev = [
+    "build>=1.3.0",
+    "pytest>=8.4.2",
+    "ruff>=0.14.0",
+    "twine>=6.2.0",
+]
+
+[project.entry-points."commitizen.plugin"]
+cz_fogoprobr = "cz_fogoprobr.cz_fogoprobr:CzFogoprobr"
