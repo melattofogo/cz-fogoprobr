@@ -1,5 +1,54 @@
+# Ambiente virtual
 .venv/
+env/
+venv/
+
+# Build e distribuição
 dist/
+build/
 *.egg-info/
+.eggs/
+*.egg
+
+# Cache do Python
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos temporários de testes
 .pytest_cache/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+htmlcov/
+.cache/
+
+# Logs e relatórios
+*.log
+*.tmp
+
+# Arquivos de IDE / editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Arquivos de controle locais
+.env
+.python-version
+uv.lock
+
+# Documentação gerada
+docs/_build/
+site/
+
+# Tipagem e checagem
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# Pacotes gerados manualmente
+*.tar.gz
+*.whl
