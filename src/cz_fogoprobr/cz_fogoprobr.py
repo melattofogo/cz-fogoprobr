@@ -33,6 +33,12 @@ class CzFogoprobr(BaseCommitizen):
                 "filter": str.strip,
                 "validate": lambda s: 5 <= len(s) <= 72,
             },
+            {
+                "type": "input",
+                "name": "body",
+                "message": "Long description (optional, use \\n for newlines):",
+                "filter": str.strip,
+            },
         ]
 
     def message(self, answers: Dict[str, Any]) -> str:
@@ -40,7 +46,12 @@ class CzFogoprobr(BaseCommitizen):
         scope = f"({answers['scope']})" if answers.get("scope") else ""
         bang = "!" if answers.get("is_breaking") else ""
         subject = answers["subject"]
-        return f"{t}{scope}{bang}: {subject}"
+        body = answers.get("body")
+
+        msg = f"{t}{scope}{bang}: {subject}"
+        if body:
+            msg = f"{msg}\n\n{body}"
+        return msg
 
     def bump_pattern(self) -> str:
         return BUMP_PATTERN
