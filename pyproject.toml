@@ -53,4 +53,4 @@ dev = [
 ]
 
 [project.entry-points."commitizen.plugin"]
-cz_fogoprobr = "cz_fogoprobr.cz_fogoprobr:CzFogoprobr"
+cz_fogoprobr = "cz_fogoprobr:CzFogoprobr"
