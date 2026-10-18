@@ -5,10 +5,20 @@ from commitizen.cz.base import BaseCommitizen
 from commitizen.git import GitCommit
 
 from .spec import (
-    TYPES, SCHEMA_PATTERN, BUMP_PATTERN, BUMP_MAP, CHANGELOG_PATTERN
+    TYPES, SCHEMA_PATTERN, BUMP_PATTERN, BUMP_MAP, BUMP_MAP_MAJOR_VERSION_ZERO,
+    CHANGELOG_PATTERN, COMMIT_PARSER, CHANGE_TYPE_MAP, CHANGE_TYPE_ORDER,
 )
 
 class CzFogoprobr(BaseCommitizen):
+    # commitizen reads these as class attributes (not methods) in cz bump / cz changelog
+    bump_pattern = BUMP_PATTERN
+    bump_map = BUMP_MAP
+    bump_map_major_version_zero = BUMP_MAP_MAJOR_VERSION_ZERO
+    changelog_pattern = CHANGELOG_PATTERN
+    commit_parser = COMMIT_PARSER
+    change_type_map = CHANGE_TYPE_MAP
+    change_type_order = CHANGE_TYPE_ORDER
+
     def info(self) -> str:
         return "fogoprobr Commitizen convention (strict header, optional scope, optional breaking '!')."
 
@@ -53,14 +63,13 @@ class CzFogoprobr(BaseCommitizen):
             msg = f"{msg}\n\n{body}"
         return msg
 
-    def bump_pattern(self) -> str:
-        return BUMP_PATTERN
-
-    def bump_map(self) -> Dict[str, str]:
-        return BUMP_MAP
-
-    def changelog_pattern(self) -> str:
-        return CHANGELOG_PATTERN
+    def changelog_message_builder_hook(
+        self, parsed_message: Dict[str, Any], commit: GitCommit
+    ) -> Dict[str, Any]:
+        # `type!:` commits go to the BREAKING CHANGE section instead of their type's
+        if parsed_message.get("breaking"):
+            parsed_message["change_type"] = "BREAKING CHANGE"
+        return parsed_message
 
     def subject(self, commit: GitCommit) -> str:
         first = commit.message.splitlines()[0]
