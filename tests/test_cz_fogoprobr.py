@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 # Add src to sys.path to ensure we can import the local version
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
+import commitizen  # noqa: F401 -- load commitizen first; its plugin discovery imports cz_fogoprobr
 from cz_fogoprobr.base import CzFogoprobr
 from cz_fogoprobr.spec import SCHEMA_PATTERN
 
