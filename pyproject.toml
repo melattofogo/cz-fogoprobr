@@ -7,7 +7,7 @@ name = "commitizen-cz-fogoprobr"
 version = "2.1.1"
 description = "Commitizen adapter: fogoprobr custom rules"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "João Fogo", email = "fogo.melatto@gmail.com" }]
 keywords = ["commitizen", "conventional-commits", "cz", "fogoprobr"]
@@ -31,7 +31,7 @@ packages = ["src/cz_fogoprobr"]
 # --- Optional dev tools ---
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+target-version = "py310"
 select = ["E","F","I","UP"]
 
 [tool.pytest.ini_options]
