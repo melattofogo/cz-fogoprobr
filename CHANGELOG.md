@@ -1,3 +1,19 @@
+## v3.0.0 (2026-10-24)
+
+### BREAKING CHANGE
+
+- **pyproject**: exigir Python >=3.10
+- o pacote não instala mais em Python 3.9.
+
+### Fix
+
+- **uv**: atualizar requests para corrigir CVE-2026-25645
+- **uv**: atualizar pytest para corrigir CVE-2025-71176
+- **uv**: atualizar pygments para corrigir CVE-2026-4539
+- **uv**: atualizar idna para corrigir CVE-2026-45409
+- **uv**: atualizar cryptography para corrigir alertas Dependabot
+- **uv**: atualizar urllib3 para corrigir CVE-2025-66418
+
 ## v2.1.1 (2026-10-18)
 
 ### Fix
