@@ -1,0 +1,105 @@
+# Publica no PyPI e cria a GitHub Release a partir de uma tag vX.Y.Z.
+#
+# Fluxo normal: `cz bump` local → `git push origin master --follow-tags`.
+# Para (re)publicar uma tag já existente: Actions → Release → Run workflow.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag a publicar (ex.: v3.0.0)"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.TAG }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --locked
+      - run: uv run pytest
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.TAG }}
+      - uses: astral-sh/setup-uv@v6
+      - name: Conferir tag com a versão do pyproject
+        run: |
+          version=$(uv version --short)
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::Tag $TAG não bate com a versão $version do pyproject.toml"
+            exit 1
+          fi
+      - run: uv build
+      - name: Extrair notas da versão do CHANGELOG
+        run: |
+          awk -v tag="$TAG" '
+            index($0, "## " tag " ") == 1 { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          test -s release-notes.md || { echo "::error::Seção $TAG não encontrada no CHANGELOG.md"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            dist/
+            release-notes.md
+
+  publish-pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/commitizen-cz-fogoprobr/
+    permissions:
+      id-token: write # Trusted Publishing: sem token no repositório
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - uses: astral-sh/setup-uv@v6
+      - run: uv publish dist/*
+
+  github-release:
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - name: Criar GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$TAG" \
+            --notes-file release-notes.md \
+            --verify-tag
